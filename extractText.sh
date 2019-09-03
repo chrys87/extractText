@@ -65,8 +65,8 @@ extractPDFFile () {
 OCRFile () {
     echo "OCR Processing"
     clearWorkSpace $1
-    echo "Split PDF"
-    convert -density 300 "$WorkSpacePath$filename" "$WorkSpacePath"Seite.png
+    echo "Split multipage file"
+    convert -density 600 "$WorkSpacePath$filename" "$WorkSpacePath"Seite.png
     rm "$WorkSpacePath$filename"
     echo "OCR running"
     for i in `ls -v $WorkSpacePath | grep .png`;
