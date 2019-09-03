@@ -35,7 +35,7 @@ checkRequirements() {
 }
 
 initWorkSpace () {
-    echo "Bereite Arbeitsverzeichnis in $WorkSpacePath vor"
+    echo "Prepare workspace $WorkSpacePath"
     cleanupWorkSpace
     mkdir $WorkSpacePath
     cp $1 $WorkSpacePath
@@ -57,21 +57,21 @@ cleanupFile() {
 }
 
 extractPDFFile () {
-    echo "Extract"
+    echo "Extract Processing"
     clearWorkSpace $1
     local content=$(pdftotext -layout "$WorkSpacePath$filename" "$WorkSpacePath"complete.txt)
 }
 
 OCRFile () {
-    echo "OCR "
+    echo "OCR Processing"
     clearWorkSpace $1
-    echo "Zerlege PDF in ein Bild Pro Seite"
+    echo "Split PDF"
     convert -density 300 "$WorkSpacePath$filename" "$WorkSpacePath"Seite.png
     rm "$WorkSpacePath$filename"
-    echo "OCR Vorgang Läuft"
+    echo "OCR running"
     for i in `ls -v $WorkSpacePath | grep .png`;
     do
-        echo "OCR $i"
+        echo "OCRed $i"
         tesseract "$WorkSpacePath$i" "$WorkSpacePath"output -l deu+eng --oem 0 &> /dev/null
         cat "$WorkSpacePath"output.txt >> "$WorkSpacePath"complete.txt
         rm "$WorkSpacePath"output.txt
@@ -98,7 +98,7 @@ proceed () {
 
     cleanupWorkSpace
 
-    echo "Fertig: gespeichert in $filename.txt"
+    echo "File saved: $filename.txt"
 }
 
 proceed $1
