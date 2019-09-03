@@ -43,7 +43,6 @@ initWorkSpace () {
 cleanupWorkSpace () {
     if [ -d "$WorkSpacePath" ];
     then
-        echo "Räume auf"
         rm -r $WorkSpacePath
     fi
 }
@@ -53,15 +52,14 @@ cleanupFile() {
     echo $ret
 }
 
-extractFile () {
-    echo "extract Prozess"
+extractPDFFile () {
+    echo "Extract"
     initWorkSpace $1
-    local content=$(pdftotext -layout "$WorkSpacePath$filename" "$WorkSpacePath"output.txt)
-    awk '{gsub(/\x0c/,"");print}' "$WorkSpacePath"output.txt > "$WorkSpacePath"complete.txt
+    local content=$(pdftotext -layout "$WorkSpacePath$filename" "$WorkSpacePath"complete.txt)
 }
 
 OCRFile () {
-    echo "OCR Prozess"
+    echo "OCR "
     initWorkSpace $1
     echo "Zerlege PDF in ein Bild Pro Seite"
     convert -density 300 "$WorkSpacePath$filename" "$WorkSpacePath"Seite.png
@@ -78,12 +76,17 @@ OCRFile () {
 
 proceed () {
     checkRequirements
-    extractFile $1
-
-    filesize=$(stat -c%s "$WorkSpacePath"complete.txt)
+    touch "$WorkSpacePath"complete.txt
+    filesize=0
+    if [ $(head -c 4 "$1") = "%PDF" ];
+    then
+        extractPDFFile $1
+        awk '{gsub(/\x0c/,"");print}' "$WorkSpacePath"complete.txt > "$WorkSpacePath"len.txt
+        filesize=$(stat -c%s "$WorkSpacePath"len.txt)
+    fi
+    
     if (( $filesize < $maxsize ));
     then
-        echo "inhalt nicht extrahierbar"
         OCRFile $1
     fi
 
