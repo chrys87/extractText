@@ -4,6 +4,7 @@
 WorkSpacePath=$(mktemp -d)/
 currentDir=$(pwd)
 filename=$(basename -- "$1")
+maxsize=5
 
 # dont continue on error
 set -e
@@ -49,14 +50,14 @@ cleanupWorkSpace () {
 
 cleanupFile() {
     local ret=$(awk '!NF {if (++n <= 2) print; next}; {n=0;print}' $1)
-     echo $ret
+    echo $ret
 }
 
 extractFile () {
     echo "extract Prozess"
     initWorkSpace $1
-    local ret=$(pdftotext -layout "$WorkSpacePath$filename" "$WorkSpacePath"complete.txt)
-    cleanupFile "$WorkSpacePath"complete.txt > $filename.txt
+    local content=$(pdftotext -layout "$WorkSpacePath$filename" "$WorkSpacePath"output.txt)
+    awk '{gsub(/\x0c/,"");print}' "$WorkSpacePath"output.txt > "$WorkSpacePath"complete.txt
 }
 
 OCRFile () {
@@ -73,11 +74,20 @@ OCRFile () {
         cat "$WorkSpacePath"output.txt >> "$WorkSpacePath"complete.txt
         rm "$WorkSpacePath"output.txt
     done
-    cleanupFile "$WorkSpacePath"complete.txt > $filename.txt
 }
 
 checkRequirements
 extractFile $1
-#OCRFile $1
+
+filesize=$(stat -c%s "$WorkSpacePath"complete.txt)
+if (( $filesize < $maxsize ));
+then
+    echo "inhalt nicht extrahierbar"
+    OCRFile $1
+fi
+
+cleanupFile "$WorkSpacePath"complete.txt > $filename.txt
+
 cleanupWorkSpace
+
 echo "Fertig: gespeichert in $filename.txt"
