@@ -40,6 +40,10 @@ initWorkSpace () {
     mkdir $WorkSpacePath
     cp $1 $WorkSpacePath
 }
+clearWorkSpace() {
+    rm -r /$WorkSpacePath*
+    cp $1 $WorkSpacePath
+}
 cleanupWorkSpace () {
     if [ -d "$WorkSpacePath" ];
     then
@@ -54,13 +58,13 @@ cleanupFile() {
 
 extractPDFFile () {
     echo "Extract"
-    initWorkSpace $1
+    clearWorkSpace $1
     local content=$(pdftotext -layout "$WorkSpacePath$filename" "$WorkSpacePath"complete.txt)
 }
 
 OCRFile () {
     echo "OCR "
-    initWorkSpace $1
+    clearWorkSpace $1
     echo "Zerlege PDF in ein Bild Pro Seite"
     convert -density 300 "$WorkSpacePath$filename" "$WorkSpacePath"Seite.png
     rm "$WorkSpacePath$filename"
@@ -76,7 +80,7 @@ OCRFile () {
 
 proceed () {
     checkRequirements
-    touch "$WorkSpacePath"complete.txt
+    initWorkSpace $1
     filesize=0
     if [ $(head -c 4 "$1") = "%PDF" ];
     then
