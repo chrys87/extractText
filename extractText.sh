@@ -76,18 +76,22 @@ OCRFile () {
     done
 }
 
-checkRequirements
-extractFile $1
+proceed () {
+    checkRequirements
+    extractFile $1
 
-filesize=$(stat -c%s "$WorkSpacePath"complete.txt)
-if (( $filesize < $maxsize ));
-then
-    echo "inhalt nicht extrahierbar"
-    OCRFile $1
-fi
+    filesize=$(stat -c%s "$WorkSpacePath"complete.txt)
+    if (( $filesize < $maxsize ));
+    then
+        echo "inhalt nicht extrahierbar"
+        OCRFile $1
+    fi
 
-cleanupFile "$WorkSpacePath"complete.txt > $filename.txt
+    cleanupFile "$WorkSpacePath"complete.txt > $filename.txt
 
-cleanupWorkSpace
+    cleanupWorkSpace
 
-echo "Fertig: gespeichert in $filename.txt"
+    echo "Fertig: gespeichert in $filename.txt"
+}
+
+proceed $1
