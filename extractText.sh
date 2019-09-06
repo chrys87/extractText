@@ -72,7 +72,7 @@ OCRFile () {
     for i in `ls -v $WorkSpacePath | grep .png`;
     do
         echo "OCRed $i"
-        tesseract "$WorkSpacePath$i" "$WorkSpacePath"output -l deu+eng --oem 0 &> /dev/null
+        tesseract "$WorkSpacePath$i" "$WorkSpacePath"output -l eng --oem 0 &> /dev/null
         cat "$WorkSpacePath"output.txt >> "$WorkSpacePath"complete.txt
         rm "$WorkSpacePath"output.txt
     done
